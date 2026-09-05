@@ -64,3 +64,48 @@ Nothing has been committed to git yet.
 - Field-level data validation (checksum/pattern rules on bindings) is out of scope
   for now.
 - Conditional fields (`when` predicates) are out of scope for now.
+
+## 2026-09-05 (later) — Test infrastructure and formatting
+
+**Ask:** discussed what testing/linting/style tooling would make sense for a
+JSON-Schema-plus-docs repo (see prior discussion in conversation, not recorded
+here); decided to implement the highest-value, lowest-cost piece first (schema
+validity/lint) plus a formatter, using Python as the primary language for new
+tooling. Explicitly deferred: the positive/negative fixture test suite, an
+automated example-vs-schema regression check, and Markdown link-checking.
+
+**Work done:**
+
+- Added `tests/test_schema_validity.py` (pytest + the `jsonschema` library):
+  checks `schema/annotation.schema.json` is valid JSON, conforms to the JSON
+  Schema draft 2020-12 meta-schema, and has no dangling internal `$ref`s. All
+  three pass against the schema unchanged — no schema edits were needed.
+- Added `pyproject.toml` (`[tool.pytest.ini_options]`, `[tool.black]`,
+  `[tool.ruff]`) and `requirements-dev.txt` (pinned: `jsonschema`, `pytest`,
+  `black`, `ruff`) for a reproducible Python dev setup.
+- Added Prettier config (`.prettierrc.json`, `.prettierignore` — excludes
+  dev-tooling directories) and ran it once over the repo's
+  existing JSON/Markdown files to establish a clean baseline. This reformatted
+  `schema/annotation.schema.json`, `examples/f1040-simplified.annotation.json`,
+  `README.md`, `SPEC.md`, and `CLAUDE.md` — confirmed semantically identical
+  for the JSON files (byte-for-byte equal parsed objects) and re-validated the
+  example against the schema afterward; the Markdown changes are Prettier's
+  standard style normalization (bullet marker, emphasis marker, table padding),
+  not wording changes.
+- Updated `CLAUDE.md` with a "Development setup" section documenting how to
+  install, test, format, and lint.
+- Ran `pytest`, `black --check`, `ruff check`, and `prettier --check` together
+  as a final pass; all clean.
+
+**Status:** schema validity is now covered by an automated (Python) test, and
+JSON/Markdown formatting is enforced by Prettier with Python code (currently
+just the test file) formatted by black/ruff. Nothing has been committed to git
+yet.
+
+**Open items / possible next steps** (still not started):
+
+- Positive/negative fixture tests exercising the schema's actual validation
+  rules (field-type discrimination, binding pattern edges, enum/format edges).
+- An automated check that `examples/*.annotation.json` still validates against
+  the schema (currently only done ad hoc / manually).
+- Markdown link-checking for the relative links in SPEC.md/README.md/CLAUDE.md.

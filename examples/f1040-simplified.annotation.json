@@ -11,9 +11,7 @@
       "filename": "f1040--2025.pdf"
     }
   },
-  "pages": [
-    { "number": 1, "width": 612, "height": 792 }
-  ],
+  "pages": [{ "number": 1, "width": 612, "height": 792 }],
   "defaults": {
     "font": { "family": "Helvetica", "size": 9 },
     "overflow": "shrink"
@@ -66,11 +64,31 @@
       "binding": "$.return.filingStatus",
       "required": true,
       "options": [
-        { "value": "single", "label": "Single", "rect": { "x": 40, "y": 78, "w": 9, "h": 9 } },
-        { "value": "mfj", "label": "Married filing jointly", "rect": { "x": 88, "y": 78, "w": 9, "h": 9 } },
-        { "value": "mfs", "label": "Married filing separately", "rect": { "x": 200, "y": 78, "w": 9, "h": 9 } },
-        { "value": "hoh", "label": "Head of household", "rect": { "x": 320, "y": 78, "w": 9, "h": 9 } },
-        { "value": "qss", "label": "Qualifying surviving spouse", "rect": { "x": 430, "y": 78, "w": 9, "h": 9 } }
+        {
+          "value": "single",
+          "label": "Single",
+          "rect": { "x": 40, "y": 78, "w": 9, "h": 9 }
+        },
+        {
+          "value": "mfj",
+          "label": "Married filing jointly",
+          "rect": { "x": 88, "y": 78, "w": 9, "h": 9 }
+        },
+        {
+          "value": "mfs",
+          "label": "Married filing separately",
+          "rect": { "x": 200, "y": 78, "w": 9, "h": 9 }
+        },
+        {
+          "value": "hoh",
+          "label": "Head of household",
+          "rect": { "x": 320, "y": 78, "w": 9, "h": 9 }
+        },
+        {
+          "value": "qss",
+          "label": "Qualifying surviving spouse",
+          "rect": { "x": 430, "y": 78, "w": 9, "h": 9 }
+        }
       ]
     },
     {
@@ -82,8 +100,16 @@
       "binding": "$.return.digitalAssets",
       "required": true,
       "options": [
-        { "value": true, "label": "Yes", "rect": { "x": 480, "y": 150, "w": 9, "h": 9 } },
-        { "value": false, "label": "No", "rect": { "x": 520, "y": 150, "w": 9, "h": 9 } }
+        {
+          "value": true,
+          "label": "Yes",
+          "rect": { "x": 480, "y": 150, "w": 9, "h": 9 }
+        },
+        {
+          "value": false,
+          "label": "No",
+          "rect": { "x": 520, "y": 150, "w": 9, "h": 9 }
+        }
       ]
     },
     {
@@ -206,7 +232,11 @@
       "binding": "$.return.numQualifyingChildren",
       "required": false,
       "default": 0,
-      "format": { "decimalPlaces": 0, "thousandsSeparator": false, "zeroFormat": "blank" }
+      "format": {
+        "decimalPlaces": 0,
+        "thousandsSeparator": false,
+        "zeroFormat": "blank"
+      }
     },
     {
       "id": "refund-amount",

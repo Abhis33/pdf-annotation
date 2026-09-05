@@ -9,6 +9,7 @@ Behavioral guidelines to reduce common LLM coding mistakes. Merge with project-s
 **Don't assume. Don't hide confusion. Surface tradeoffs.**
 
 Before implementing:
+
 - State your assumptions explicitly. If uncertain, ask.
 - If multiple interpretations exist, present them - don't pick silently.
 - If a simpler approach exists, say so. Push back when warranted.
@@ -31,12 +32,14 @@ Ask yourself: "Would a senior engineer say this is overcomplicated?" If yes, sim
 **Touch only what you must. Clean up only your own mess.**
 
 When editing existing code:
+
 - Don't "improve" adjacent code, comments, or formatting.
 - Don't refactor things that aren't broken.
 - Match existing style, even if you'd do it differently.
 - If you notice unrelated dead code, mention it - don't delete it.
 
 When your changes create orphans:
+
 - Remove imports/variables/functions that YOUR changes made unused.
 - Don't remove pre-existing dead code unless asked.
 
@@ -47,11 +50,13 @@ The test: Every changed line should trace directly to the user's request.
 **Define success criteria. Loop until verified.**
 
 Transform tasks into verifiable goals:
+
 - "Add validation" → "Write tests for invalid inputs, then make them pass"
 - "Fix the bug" → "Write a test that reproduces it, then make it pass"
 - "Refactor X" → "Ensure tests pass before and after"
 
 For multi-step tasks, state a brief plan:
+
 ```
 1. [Step] → verify: [check]
 2. [Step] → verify: [check]
@@ -78,13 +83,13 @@ who builds a renderer, and the caller who supplies data.
 
 ## Key files
 
-| Path | Role |
-|------|------|
-| `SPEC.md` | Normative specification: coordinate system, field types, formatting rules, the data-binding grammar, the rendering contract. Read this before changing the schema. |
-| `schema/annotation.schema.json` | JSON Schema (draft 2020-12) that validates annotation documents. Must stay in sync with SPEC.md — a property that exists in one but not the other is a bug. |
-| `examples/f1040-simplified.annotation.json` | Worked example exercising every field type. Must always validate against `schema/annotation.schema.json`. |
-| `examples/sample-data.json` | The nested data set the example annotation binds against. |
-| `README.md` | Entry point / quick overview, links into the above. |
+| Path                                        | Role                                                                                                                                                               |
+| ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `SPEC.md`                                   | Normative specification: coordinate system, field types, formatting rules, the data-binding grammar, the rendering contract. Read this before changing the schema. |
+| `schema/annotation.schema.json`             | JSON Schema (draft 2020-12) that validates annotation documents. Must stay in sync with SPEC.md — a property that exists in one but not the other is a bug.        |
+| `examples/f1040-simplified.annotation.json` | Worked example exercising every field type. Must always validate against `schema/annotation.schema.json`.                                                          |
+| `examples/sample-data.json`                 | The nested data set the example annotation binds against.                                                                                                          |
+| `README.md`                                 | Entry point / quick overview, links into the above.                                                                                                                |
 
 ## Design constraints (intentional, not gaps)
 
@@ -120,9 +125,41 @@ without the user explicitly asking to expand scope:
 - Field `id`s should mirror the form's printed labels (`line-1a-wages`,
   `dependent1-name`) so an annotation is reviewable against the paper form.
 - Annotation files are named `<form.id>.annotation.json`, one per `(form.id,
-  form.revision)` pair.
+form.revision)` pair.
 - Don't add new field types, transforms, or a repeat construct without confirming
   scope first — see "Design constraints" above.
+
+## Development setup
+
+Python is the primary language for this repo's tooling (tests, lint). Dev
+dependencies are pinned in `requirements-dev.txt`:
+
+```bash
+python3 -m venv .venv
+./.venv/bin/pip install -r requirements-dev.txt
+```
+
+- **Tests** (`tests/test_schema_validity.py`): checks that
+  `schema/annotation.schema.json` is well-formed JSON, is a legal draft 2020-12
+  JSON Schema, and has no dangling internal `$ref`s. Run with:
+  ```bash
+  ./.venv/bin/pytest
+  ```
+  This does not validate any annotation document against the schema — that's a
+  separate, not-yet-added check (see `progress.md`).
+- **Python formatting/lint**: `black` (formatter) and `ruff` (linter), configured
+  in `pyproject.toml`.
+  ```bash
+  ./.venv/bin/black tests/
+  ./.venv/bin/ruff check tests/
+  ```
+- **JSON/Markdown formatting**: Prettier, configured in `.prettierrc.json`.
+  Run via `npx`, same convention as the `ajv-cli` command above — pin the
+  version so formatting is reproducible:
+  ```bash
+  npx prettier@3.3.3 --check "**/*.{json,md}" --ignore-path .prettierignore
+  npx prettier@3.3.3 --write "**/*.{json,md}" --ignore-path .prettierignore
+  ```
 
 ## See also
 

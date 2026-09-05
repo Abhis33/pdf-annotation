@@ -4,12 +4,7 @@
   "title": "Tax Form Annotation Document",
   "description": "Defines where and how supplied structured data is rendered onto a tax form PDF. The annotation describes field location, data binding, formatting, and presentation. It does not transform or conditionally derive data.",
   "type": "object",
-  "required": [
-    "specVersion",
-    "form",
-    "pages",
-    "fields"
-  ],
+  "required": ["specVersion", "form", "pages", "fields"],
   "additionalProperties": false,
 
   "properties": {
@@ -53,13 +48,9 @@
   },
 
   "$defs": {
-
     "form": {
       "type": "object",
-      "required": [
-        "id",
-        "revision"
-      ],
+      "required": ["id", "revision"],
       "additionalProperties": false,
 
       "properties": {
@@ -67,19 +58,13 @@
           "type": "string",
           "pattern": "^[a-z0-9][a-z0-9-]*$",
           "description": "Stable identifier for the form.",
-          "examples": [
-            "f1040",
-            "f1040-sr",
-            "w2"
-          ]
+          "examples": ["f1040", "f1040-sr", "w2"]
         },
 
         "name": {
           "type": "string",
           "description": "Human-readable name of the form.",
-          "examples": [
-            "Form 1040 - U.S. Individual Income Tax Return"
-          ]
+          "examples": ["Form 1040 - U.S. Individual Income Tax Return"]
         },
 
         "taxYear": {
@@ -91,19 +76,14 @@
         "revision": {
           "type": "string",
           "description": "Form revision identifier. Field coordinates are valid only for this revision.",
-          "examples": [
-            "2025"
-          ]
+          "examples": ["2025"]
         },
 
         "jurisdiction": {
           "type": "string",
           "default": "US-IRS",
           "description": "Authority or jurisdiction that issued the form.",
-          "examples": [
-            "US-IRS",
-            "US-CA-FTB"
-          ]
+          "examples": ["US-IRS", "US-CA-FTB"]
         },
 
         "sourcePdf": {
@@ -115,9 +95,7 @@
 
     "sourcePdf": {
       "type": "object",
-      "required": [
-        "filename"
-      ],
+      "required": ["filename"],
       "additionalProperties": false,
 
       "properties": {
@@ -136,11 +114,7 @@
 
     "page": {
       "type": "object",
-      "required": [
-        "number",
-        "width",
-        "height"
-      ],
+      "required": ["number", "width", "height"],
       "additionalProperties": false,
 
       "properties": {
@@ -180,12 +154,7 @@
 
     "rect": {
       "type": "object",
-      "required": [
-        "x",
-        "y",
-        "w",
-        "h"
-      ],
+      "required": ["x", "y", "w", "h"],
       "additionalProperties": false,
 
       "properties": {
@@ -280,21 +249,13 @@
 
         "textAlignment": {
           "type": "string",
-          "enum": [
-            "left",
-            "center",
-            "right"
-          ],
+          "enum": ["left", "center", "right"],
           "default": "left"
         },
 
         "verticalAlignment": {
           "type": "string",
-          "enum": [
-            "top",
-            "middle",
-            "bottom"
-          ],
+          "enum": ["top", "middle", "bottom"],
           "default": "middle"
         },
 
@@ -304,11 +265,7 @@
 
         "overflow": {
           "type": "string",
-          "enum": [
-            "shrink",
-            "truncate",
-            "error"
-          ],
+          "enum": ["shrink", "truncate", "error"],
           "default": "shrink",
           "description": "Behavior when rendered content does not fit inside the field."
         },
@@ -347,10 +304,7 @@
 
         "weight": {
           "type": "string",
-          "enum": [
-            "normal",
-            "bold"
-          ],
+          "enum": ["normal", "bold"],
           "default": "normal"
         },
 
@@ -376,12 +330,7 @@
     "fieldBase": {
       "type": "object",
 
-      "required": [
-        "id",
-        "type",
-        "page",
-        "binding"
-      ],
+      "required": ["id", "type", "page", "binding"],
 
       "properties": {
         "id": {
@@ -482,9 +431,7 @@
 
     "textField": {
       "type": "object",
-      "required": [
-        "rect"
-      ],
+      "required": ["rect"],
 
       "properties": {
         "type": {
@@ -508,10 +455,7 @@
 
         "case": {
           "type": "string",
-          "enum": [
-            "preserve",
-            "upper"
-          ],
+          "enum": ["preserve", "upper"],
           "default": "preserve"
         }
       }
@@ -519,9 +463,7 @@
 
     "numberField": {
       "type": "object",
-      "required": [
-        "rect"
-      ],
+      "required": ["rect"],
 
       "properties": {
         "type": {
@@ -556,20 +498,13 @@
 
         "negativeFormat": {
           "type": "string",
-          "enum": [
-            "minus",
-            "parentheses"
-          ],
+          "enum": ["minus", "parentheses"],
           "default": "minus"
         },
 
         "zeroFormat": {
           "type": "string",
-          "enum": [
-            "print",
-            "blank",
-            "dash"
-          ],
+          "enum": ["print", "blank", "dash"],
           "default": "print"
         }
       }
@@ -577,9 +512,7 @@
 
     "currencyField": {
       "type": "object",
-      "required": [
-        "rect"
-      ],
+      "required": ["rect"],
 
       "properties": {
         "type": {
@@ -610,10 +543,7 @@
 
         "decimalPlaces": {
           "type": "integer",
-          "enum": [
-            0,
-            2
-          ],
+          "enum": [0, 2],
           "default": 0
         },
 
@@ -629,20 +559,13 @@
 
         "negativeFormat": {
           "type": "string",
-          "enum": [
-            "minus",
-            "parentheses"
-          ],
+          "enum": ["minus", "parentheses"],
           "default": "parentheses"
         },
 
         "zeroFormat": {
           "type": "string",
-          "enum": [
-            "print",
-            "blank",
-            "dash"
-          ],
+          "enum": ["print", "blank", "dash"],
           "default": "print"
         }
       }
@@ -650,9 +573,7 @@
 
     "dateField": {
       "type": "object",
-      "required": [
-        "rect"
-      ],
+      "required": ["rect"],
 
       "properties": {
         "type": {
@@ -673,12 +594,7 @@
 
     "combField": {
       "type": "object",
-      "required": [
-        "cells",
-        "cellOrigin",
-        "pitch",
-        "cellSize"
-      ],
+      "required": ["cells", "cellOrigin", "pitch", "cellSize"],
 
       "properties": {
         "type": {
@@ -693,10 +609,7 @@
 
         "cellOrigin": {
           "type": "object",
-          "required": [
-            "x",
-            "y"
-          ],
+          "required": ["x", "y"],
           "additionalProperties": false,
 
           "properties": {
@@ -720,10 +633,7 @@
 
         "cellSize": {
           "type": "object",
-          "required": [
-            "w",
-            "h"
-          ],
+          "required": ["w", "h"],
           "additionalProperties": false,
 
           "properties": {
@@ -748,10 +658,7 @@
 
         "fit": {
           "type": "string",
-          "enum": [
-            "exact",
-            "left"
-          ],
+          "enum": ["exact", "left"],
           "default": "exact",
           "description": "Whether the supplied value must exactly fill the cells or may use fewer cells."
         }
@@ -760,10 +667,7 @@
 
     "combGap": {
       "type": "object",
-      "required": [
-        "afterCell",
-        "extra"
-      ],
+      "required": ["afterCell", "extra"],
       "additionalProperties": false,
 
       "properties": {
@@ -782,10 +686,7 @@
 
     "checkboxField": {
       "type": "object",
-      "required": [
-        "rect",
-        "checkedWhen"
-      ],
+      "required": ["rect", "checkedWhen"],
 
       "properties": {
         "type": {
@@ -802,11 +703,7 @@
 
         "mark": {
           "type": "string",
-          "enum": [
-            "X",
-            "check",
-            "fill"
-          ],
+          "enum": ["X", "check", "fill"],
           "default": "X"
         }
       }
@@ -833,9 +730,7 @@
 
     "radioGroupField": {
       "type": "object",
-      "required": [
-        "options"
-      ],
+      "required": ["options"],
 
       "properties": {
         "type": {
@@ -852,11 +747,7 @@
 
         "mark": {
           "type": "string",
-          "enum": [
-            "X",
-            "check",
-            "fill"
-          ],
+          "enum": ["X", "check", "fill"],
           "default": "X"
         }
       }
@@ -864,10 +755,7 @@
 
     "radioOption": {
       "type": "object",
-      "required": [
-        "value",
-        "rect"
-      ],
+      "required": ["value", "rect"],
       "additionalProperties": false,
 
       "properties": {

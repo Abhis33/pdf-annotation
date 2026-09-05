@@ -3,7 +3,7 @@
 **specVersion 1.0**
 
 This document is the normative specification for annotating fields and boxes on U.S. tax
-forms. An *annotation document* describes, for one revision of one form, where every
+forms. An _annotation document_ describes, for one revision of one form, where every
 fillable box sits on the page, how the value printed inside it must be formatted, and
 which single value from a caller's own (arbitrarily nested) data set belongs there.
 Given an annotation document, a data set, and the blank form PDF, an application with no
@@ -21,8 +21,8 @@ The key words MUST, MUST NOT, SHOULD, and MAY are to be interpreted as in RFC 21
 
 ## 1. Scope
 
-**What this spec is:** a description of *where* a value goes, *how* it must look once
-printed, and *which* value in the caller's data set it comes from.
+**What this spec is:** a description of _where_ a value goes, _how_ it must look once
+printed, and _which_ value in the caller's data set it comes from.
 
 **What this spec is deliberately not:** a place to compute or derive values. Every value
 a field prints MUST already exist, in its final printed form's underlying value, somewhere
@@ -43,11 +43,11 @@ the paper form line for line.
 
 Two consequences worth stating up front:
 
-* A field can be **skipped** (nothing printed) when its bound value is absent — see
+- A field can be **skipped** (nothing printed) when its bound value is absent — see
   section 6.3 — but it can never be **conditionally rendered** based on some other
   field's value, and it can never **transform** its input. Both are intentionally out
   of scope for this version.
-* Because there's no derived/aggregate value support, "the fifth dependent doesn't
+- Because there's no derived/aggregate value support, "the fifth dependent doesn't
   fit" is not a case this spec detects. If a form only defines two dependent field sets
   and the data set has three dependents, the third is simply never referenced by any
   binding — the caller is responsible for deciding what to do with data it knows won't
@@ -57,13 +57,13 @@ Two consequences worth stating up front:
 
 An annotation document is a single JSON object:
 
-| Property      | Req | Meaning |
-|---------------|-----|---------|
-| `specVersion` | ✓   | Always `"1.0"` for this spec. Renderers MUST reject other values. |
+| Property      | Req | Meaning                                                                                                               |
+| ------------- | --- | --------------------------------------------------------------------------------------------------------------------- |
+| `specVersion` | ✓   | Always `"1.0"` for this spec. Renderers MUST reject other values.                                                     |
 | `form`        | ✓   | Identity: `id` (e.g. `"f1040"`), `revision` (e.g. `"2025"`), optional `name`, `taxYear`, `jurisdiction`, `sourcePdf`. |
-| `pages`       | ✓   | One entry per annotated page; establishes the coordinate space (section 3). |
-| `defaults`    |     | Document-wide style defaults (section 4). |
-| `fields`      | ✓   | The annotated boxes (section 5). |
+| `pages`       | ✓   | One entry per annotated page; establishes the coordinate space (section 3).                                           |
+| `defaults`    |     | Document-wide style defaults (section 4).                                                                             |
+| `fields`      | ✓   | The annotated boxes (section 5).                                                                                      |
 
 **Form identity.** Coordinates are only meaningful against one printing of one form. The
 pair (`form.id`, `form.revision`) MUST uniquely identify the annotation; the IRS moves
@@ -74,11 +74,11 @@ detect when someone points an old annotation at a revised PDF.
 
 ## 3. Coordinate system
 
-* **Unit:** PDF points, 1 pt = 1/72 inch (`page.unit` is always `"pt"`). US Letter is
+- **Unit:** PDF points, 1 pt = 1/72 inch (`page.unit` is always `"pt"`). US Letter is
   612 × 792 pt.
-* **Origin:** the **top-left corner of the page** (`page.origin` is always `"top-left"`),
+- **Origin:** the **top-left corner of the page** (`page.origin` is always `"top-left"`),
   x increasing rightward, y increasing **downward**.
-* Every field names its `page` (1-based index into the source PDF).
+- Every field names its `page` (1-based index into the source PDF).
 
 The top-left origin is deliberate: humans and annotation tools measure forms from the
 top of the page down, and screen/screenshot coordinates already work this way. PDF's
@@ -100,18 +100,18 @@ Style properties may appear in `defaults` (document-wide) and in any field's `st
 (field-level). Resolution order for each individual property: **field → defaults → spec
 default**, where the spec defaults are:
 
-| Property                    | Default       | Meaning |
-|------------------------------|---------------|---------|
-| `font.family`                | `"Helvetica"` | Font family name. Renderers MUST substitute a metrically similar font if unavailable. |
-| `font.size`                  | `9`           | Point size. |
-| `font.weight`                | `"normal"`    | `normal` \| `bold`. |
-| `font.color`                 | `"#000000"`   | `#rrggbb`. |
-| `textAlignment`               | `"left"`      | Horizontal alignment within the padded rect: `left` \| `center` \| `right`. |
-| `verticalAlignment`          | `"middle"`    | Vertical alignment within the padded rect: `top` \| `middle` \| `bottom`. |
-| `padding.{left,right,top,bottom}` | `2` each | Inset in points applied to the corresponding rect edge before layout. |
-| `overflow`                   | `"shrink"`    | See section 7.3. |
-| `minFontSize`                | `5`           | Floor for `shrink`. |
-| `lineHeight`                 | `1.15`        | Line-height multiplier for multiline text. |
+| Property                          | Default       | Meaning                                                                               |
+| --------------------------------- | ------------- | ------------------------------------------------------------------------------------- |
+| `font.family`                     | `"Helvetica"` | Font family name. Renderers MUST substitute a metrically similar font if unavailable. |
+| `font.size`                       | `9`           | Point size.                                                                           |
+| `font.weight`                     | `"normal"`    | `normal` \| `bold`.                                                                   |
+| `font.color`                      | `"#000000"`   | `#rrggbb`.                                                                            |
+| `textAlignment`                   | `"left"`      | Horizontal alignment within the padded rect: `left` \| `center` \| `right`.           |
+| `verticalAlignment`               | `"middle"`    | Vertical alignment within the padded rect: `top` \| `middle` \| `bottom`.             |
+| `padding.{left,right,top,bottom}` | `2` each      | Inset in points applied to the corresponding rect edge before layout.                 |
+| `overflow`                        | `"shrink"`    | See section 7.3.                                                                      |
+| `minFontSize`                     | `5`           | Floor for `shrink`.                                                                   |
+| `lineHeight`                      | `1.15`        | Line-height multiplier for multiline text.                                            |
 
 Resolution is per-property, not per-object: a field's `style` may set only `font.size`
 and still inherit every other property (including the rest of `font`) from `defaults`
@@ -127,7 +127,7 @@ rendered), `formReference` (optional pointer to the printed `line`/`box`/`sectio
 reviewing the annotation against the paper form), `required`, `default`, and `style`.
 
 **`required` / `default` semantics** (shared by every field type): if the binding
-resolves to *missing* (section 6.3) — with `required: true`, rendering MUST fail with an
+resolves to _missing_ (section 6.3) — with `required: true`, rendering MUST fail with an
 error naming the field `id`; otherwise, if `default` is present, that value is used as
 if it had been the resolved value; otherwise the field is **skipped** (nothing is drawn —
 the correct behavior for, e.g., an absent second dependent's SSN).
@@ -139,9 +139,14 @@ Free text in a `rect`. `multiline: true` enables word-wrapping (section 7.2);
 handled by the overflow policy (section 7.3).
 
 ```json
-{ "id": "taxpayer-first-name", "type": "text", "page": 1,
+{
+  "id": "taxpayer-first-name",
+  "type": "text",
+  "page": 1,
   "rect": { "x": 36, "y": 104, "w": 200, "h": 16 },
-  "binding": "$.taxpayer.firstName", "required": true }
+  "binding": "$.taxpayer.firstName",
+  "required": true
+}
 ```
 
 ### 5.2 `number`
@@ -157,18 +162,23 @@ renderer silently coerces.
 
 A dollar amount. Same `format` shape as `number`, with defaults suited to IRS practice:
 
-* `currency`: ISO 4217 code, default `"USD"`.
-* `decimalPlaces`: `0` (default) or `2`. With `0`, the renderer MUST round **half away
+- `currency`: ISO 4217 code, default `"USD"`.
+- `decimalPlaces`: `0` (default) or `2`. With `0`, the renderer MUST round **half away
   from zero** (the IRS "round half up" rule: 50¢ rounds to the next dollar, and
   −$1.50 rounds to −$2).
-* `currencySymbol` (default `false`): leading currency symbol. IRS boxes pre-print the
+- `currencySymbol` (default `false`): leading currency symbol. IRS boxes pre-print the
   `$`, so leave this false unless annotating a form that doesn't.
-* `negativeFormat` default `"parentheses"`, the IRS-preferred loss notation: `(1,234)`.
+- `negativeFormat` default `"parentheses"`, the IRS-preferred loss notation: `(1,234)`.
 
 ```json
-{ "id": "line-1a-wages", "type": "currency", "page": 1,
+{
+  "id": "line-1a-wages",
+  "type": "currency",
+  "page": 1,
   "rect": { "x": 500, "y": 330, "w": 76, "h": 14 },
-  "binding": "$.income.wages.total", "required": true }
+  "binding": "$.income.wages.total",
+  "required": true
+}
 ```
 
 ### 5.4 `date`
@@ -184,28 +194,38 @@ with `dateFormat` set to `"MM"`, `"DD"`, and `"YYYY"` respectively.
 One character per printed box: SSNs, EINs, ZIP codes, routing numbers. Instead of a
 single `rect`, a comb field gives:
 
-* `cells`: number of boxes.
-* `cellOrigin`: top-left corner of the **first** cell.
-* `pitch`: distance between the left edges of adjacent cells.
-* `cellSize`: `{w, h}` of each cell.
-* `gaps` (optional): extra horizontal spacing after specific cells — SSN layouts leave a
+- `cells`: number of boxes.
+- `cellOrigin`: top-left corner of the **first** cell.
+- `pitch`: distance between the left edges of adjacent cells.
+- `cellSize`: `{w, h}` of each cell.
+- `gaps` (optional): extra horizontal spacing after specific cells — SSN layouts leave a
   visual gap for the hyphens after cells 3 and 5.
-* `fit` (default `"exact"`): after stripping the value to digits/letters, its length
+- `fit` (default `"exact"`): after stripping the value to digits/letters, its length
   MUST equal `cells`; a mismatch is a render error (a 7-digit "SSN" must never print).
   `"left"`: length MUST be ≤ `cells`; the value fills from cell 1, remaining cells stay
   blank — the right behavior for bank account number boxes, which forms often
   over-provision.
 
-Layout: cell *i* (1-based) has left edge
+Layout: cell _i_ (1-based) has left edge
 `x_i = cellOrigin.x + (i−1)·pitch + Σ(gap.extra for every gap with afterCell < i)`.
 Each character is drawn centered in its cell, using the field's resolved style.
 
 ```json
-{ "id": "taxpayer-ssn", "type": "comb", "page": 1,
-  "binding": "$.taxpayer.ssn", "required": true,
-  "cells": 9, "cellOrigin": { "x": 470, "y": 104 },
-  "pitch": 13, "cellSize": { "w": 12, "h": 16 },
-  "gaps": [ { "afterCell": 3, "extra": 6 }, { "afterCell": 5, "extra": 6 } ] }
+{
+  "id": "taxpayer-ssn",
+  "type": "comb",
+  "page": 1,
+  "binding": "$.taxpayer.ssn",
+  "required": true,
+  "cells": 9,
+  "cellOrigin": { "x": 470, "y": 104 },
+  "pitch": 13,
+  "cellSize": { "w": 12, "h": 16 },
+  "gaps": [
+    { "afterCell": 3, "extra": 6 },
+    { "afterCell": 5, "extra": 6 }
+  ]
+}
 ```
 
 The renderer MUST strip non-alphanumeric characters from the resolved value before
@@ -219,7 +239,7 @@ A single box, marked or left empty, driven by one predicate over the bound value
 `"fill"` (a solid fill covering ~70% of the rect). An unchecked box prints nothing.
 
 Prefer `radio-group` (5.7) over a pair of independent checkboxes whenever the boxes are
-meant to be mutually exclusive (e.g. a Yes/No question): a radio-group *guarantees* at
+meant to be mutually exclusive (e.g. a Yes/No question): a radio-group _guarantees_ at
 most one mark is drawn, while two checkboxes are only exclusive if their predicates
 happen to be complementary.
 
@@ -232,12 +252,25 @@ radio-group. If no option's value matches the resolved value: `required: true` i
 error, otherwise nothing is marked.
 
 ```json
-{ "id": "filing-status", "type": "radio-group", "page": 1,
-  "binding": "$.return.filingStatus", "required": true,
+{
+  "id": "filing-status",
+  "type": "radio-group",
+  "page": 1,
+  "binding": "$.return.filingStatus",
+  "required": true,
   "options": [
-    { "value": "single", "rect": { "x": 40, "y": 78, "w": 9, "h": 9 }, "label": "Single" },
-    { "value": "mfj", "rect": { "x": 88, "y": 78, "w": 9, "h": 9 }, "label": "Married filing jointly" }
-  ] }
+    {
+      "value": "single",
+      "rect": { "x": 40, "y": 78, "w": 9, "h": 9 },
+      "label": "Single"
+    },
+    {
+      "value": "mfj",
+      "rect": { "x": 88, "y": 78, "w": 9, "h": 9 },
+      "label": "Married filing jointly"
+    }
+  ]
+}
 ```
 
 ## 6. Data binding
@@ -281,7 +314,7 @@ is also treated as missing.
 
 Missing flows into the `required`/`default` rule stated in section 5: error if
 `required`, else `default` if present, else skip the field. This three-way rule is the
-*entire* error-handling model for absent data. Renderers MUST NOT invent additional
+_entire_ error-handling model for absent data. Renderers MUST NOT invent additional
 fallbacks (printing `"undefined"`, coercing `null` to `0`, etc.).
 
 ### 6.4 Modeling repeated entries: independent fields, not a repeat construct
@@ -316,19 +349,19 @@ for two dependents.)
 Consequences of this choice, stated explicitly so they aren't mistaken for
 oversights:
 
-* The number of slots a form can print is fixed by however many field groups the
+- The number of slots a form can print is fixed by however many field groups the
   annotator writes, once, when annotating the form — it is not computed from the data.
   This matches the paper form, which also has a fixed number of boxes.
-* `required: false` on every field in a slot (the normal choice) means an unpopulated
+- `required: false` on every field in a slot (the normal choice) means an unpopulated
   slot — `$.dependents[1]` absent because there's only one dependent — resolves every
   field in that group to missing, and every one of them is silently skipped. No special
   "empty slot" handling is needed; section 6.3's ordinary missing-value rule covers it.
-* If the data set has *more* entries than the form has slots for, the extra entries are
+- If the data set has _more_ entries than the form has slots for, the extra entries are
   simply never referenced by any binding. This spec does not detect or report that
   case, by design (section 1): deciding what to do about overflow — e.g., preparing an
   IRS continuation/attachment statement — is business logic that belongs in the
   caller's own code, before it hands data to a renderer, not in the annotation format.
-* This does mean an N-slot form's annotation is `N ×` as many field entries as a
+- This does mean an N-slot form's annotation is `N ×` as many field entries as a
   hypothetical repeat construct would need. That verbosity is the deliberate trade:
   every field stays a self-contained, independently reviewable box with exactly one
   binding, and the format has one less concept (no offset/repeat semantics) for an
@@ -355,13 +388,13 @@ MUST identify the offending field's `id`.
 
 ### 7.1 Formatting
 
-* **number/currency:** round to `decimalPlaces` (half away from zero), group thousands
+- **number/currency:** round to `decimalPlaces` (half away from zero), group thousands
   with `,` if `thousandsSeparator`, render the fraction with `.`. Negative values: wrap
   the whole rendered amount (symbol included) in parentheses for `"parentheses"`
   (`($1,234)`), or prefix with `-` for `"minus"`. Exact zero, per `zeroFormat`:
   `"print"` → `0` (or `0.00`), `"blank"` → skip the field, `"dash"` → an em dash.
-* **date:** apply `dateFormat` tokens (section 5.4).
-* **text:** apply `case`, then check `maxLength` (an overflowing `maxLength` follows the
+- **date:** apply `dateFormat` tokens (section 5.4).
+- **text:** apply `case`, then check `maxLength` (an overflowing `maxLength` follows the
   overflow policy below).
 
 "Fits" (used below) means: the rendered string's width is ≤ `rect.w` minus left+right
@@ -379,24 +412,24 @@ positions the resulting block within the padded rect.
 
 When the formatted text does not fit (7.1) at the field's effective font size:
 
-* `"shrink"` (default): reduce the font size in small steps until it fits or
+- `"shrink"` (default): reduce the font size in small steps until it fits or
   `minFontSize` is reached; if it still doesn't fit at `minFontSize`, escalate to an
   error. This is the safe default for anything numeric: legibility degrades gracefully,
   and nothing is ever silently lost.
-* `"truncate"`: cut characters from the end until it fits. The renderer MUST surface a
+- `"truncate"`: cut characters from the end until it fits. The renderer MUST surface a
   warning naming the field. SHOULD be reserved for cosmetic, non-numeric fields (e.g. an
   occupation field) where losing trailing characters can't misstate a filed amount.
-* `"error"`: fail immediately, no attempt to shrink or truncate. Use for any field where
+- `"error"`: fail immediately, no attempt to shrink or truncate. Use for any field where
   a partially-printed value would misstate what's being filed.
 
 ## 8. Conventions & versioning
 
-* Field `id`s SHOULD mirror the form's printed labels (`line-1a-wages`,
+- Field `id`s SHOULD mirror the form's printed labels (`line-1a-wages`,
   `dependent1-name`), so an annotation is reviewable side-by-side against the paper
   form.
-* Annotation files SHOULD be named `<form.id>.annotation.json` and kept one per
+- Annotation files SHOULD be named `<form.id>.annotation.json` and kept one per
   `form.revision`, since the IRS moves boxes between tax years.
-* This spec is versioned by `specVersion`, independent of any one form's `revision`. A
+- This spec is versioned by `specVersion`, independent of any one form's `revision`. A
   renderer encountering a `specVersion` it does not fully implement MUST refuse to
   render rather than guess — silently mis-printing a box is worse than refusing to run.
 
