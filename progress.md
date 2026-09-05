@@ -205,10 +205,6 @@ types. Nothing has been committed to git yet.
 
 **Open items / possible next steps** (not started, not committed to):
 
-- No automated tests for `annotator/` yet — coverage so far is manual/ad hoc
-  (see above). A pytest suite exercising binding resolution, formatting edge
-  cases, and a couple of full render-to-PDF smoke tests would be the natural
-  next step.
 - `sourcePdf.sha256` (SPEC.md section 2) is not checked by the renderer — it's
   documented as a pin against the wrong PDF revision but nothing currently
   verifies it.
@@ -216,3 +212,40 @@ types. Nothing has been committed to git yet.
   14 fonts (Helvetica/Times/Courier families); a `font.family` outside those
   falls back to Helvetica with a warning rather than embedding the requested
   font.
+
+## 2026-09-05 (later still) — Automated tests for `annotator/`
+
+**Ask:** close the "no automated tests for `annotator/`" gap noted above.
+
+**Work done:**
+
+- Added `pythonpath = ["."]` to `[tool.pytest.ini_options]` in `pyproject.toml`
+  — without it, `annotator` isn't importable from `tests/` (no
+  `tests/__init__.py`, and pytest's default "prepend" import mode only puts
+  `tests/` itself on `sys.path`, not the repo root).
+- `tests/test_binding.py` (12 tests): path resolution rules from SPEC.md
+  6.1/6.2/6.3 (member/index access, missing vs. `null`, non-object/non-array
+  access, falsy-but-present values) and the `strict_equals` gotchas the spec
+  calls out by name (`1 != "1"`, `True != 1`).
+- `tests/test_formatting.py` (20 tests): half-away-from-zero rounding for both
+  signs, both `negativeFormat`s, all three `zeroFormat`s, thousands separator,
+  currency symbol, decimal places, date token substitution (including the
+  `YYYY` vs. `YY` ambiguity), and comb stripping/length validation for both
+  `fit` modes.
+- `tests/test_styles.py` (7 tests): per-property resolution order (field ->
+  defaults -> spec default), confirming a partial `font` override doesn't
+  drop sibling properties, and the font-family fallback-with-warning path.
+- `tests/test_render.py` (6 tests): end-to-end smoke tests against small
+  synthetic PDFs built in-memory with reportlab (not `examples/f1040.pdf`, to
+  keep these fast and independent of that fixture) — a successful text
+  render (verified via `pypdf`'s `extract_text()`), a checkbox `X` mark, a
+  page-size-mismatch warning, and the three error paths (required-missing,
+  `overflow: "error"`) including that a failed render never writes the output
+  file and that the combined `RenderError.all_errors` names the right field.
+- All 45 new tests passed on the first run; existing 7 tests unaffected.
+  `black`/`ruff` clean on `tests/`.
+
+**Status:** all four `annotator/` modules now have automated coverage — the
+three pure-function modules at the unit level, `render.py` via targeted
+end-to-end smoke tests. 52 tests total. The `sourcePdf.sha256` and font
+embedding items above remain open.
