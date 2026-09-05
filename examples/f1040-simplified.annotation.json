@@ -1,0 +1,234 @@
+{
+  "$schema": "../schema/annotation.schema.json",
+  "specVersion": "1.0",
+  "form": {
+    "id": "f1040-simplified",
+    "name": "Form 1040 - U.S. Individual Income Tax Return (illustrative subset)",
+    "taxYear": 2025,
+    "revision": "2025",
+    "jurisdiction": "US-IRS",
+    "sourcePdf": {
+      "filename": "f1040--2025.pdf"
+    }
+  },
+  "pages": [
+    { "number": 1, "width": 612, "height": 792 }
+  ],
+  "defaults": {
+    "font": { "family": "Helvetica", "size": 9 },
+    "overflow": "shrink"
+  },
+  "fields": [
+    {
+      "id": "taxpayer-first-name",
+      "label": "Taxpayer first name and middle initial",
+      "type": "text",
+      "page": 1,
+      "formReference": { "line": "1", "box": "First name and middle initial" },
+      "rect": { "x": 36, "y": 104, "w": 200, "h": 16 },
+      "binding": "$.taxpayer.firstName",
+      "required": true
+    },
+    {
+      "id": "taxpayer-last-name",
+      "label": "Taxpayer last name",
+      "type": "text",
+      "page": 1,
+      "formReference": { "line": "1", "box": "Last name" },
+      "rect": { "x": 246, "y": 104, "w": 200, "h": 16 },
+      "binding": "$.taxpayer.lastName",
+      "required": true
+    },
+    {
+      "id": "taxpayer-ssn",
+      "label": "Taxpayer social security number",
+      "type": "comb",
+      "page": 1,
+      "formReference": { "line": "1", "box": "Your social security number" },
+      "binding": "$.taxpayer.ssn",
+      "required": true,
+      "cells": 9,
+      "cellOrigin": { "x": 470, "y": 104 },
+      "pitch": 13,
+      "cellSize": { "w": 12, "h": 16 },
+      "gaps": [
+        { "afterCell": 3, "extra": 6 },
+        { "afterCell": 5, "extra": 6 }
+      ],
+      "notes": "Value in the data set may be punctuated (123-45-6789) or bare (123456789); the renderer strips non-digits before filling cells."
+    },
+    {
+      "id": "filing-status",
+      "label": "Filing status",
+      "type": "radio-group",
+      "page": 1,
+      "formReference": { "line": "Filing Status" },
+      "binding": "$.return.filingStatus",
+      "required": true,
+      "options": [
+        { "value": "single", "label": "Single", "rect": { "x": 40, "y": 78, "w": 9, "h": 9 } },
+        { "value": "mfj", "label": "Married filing jointly", "rect": { "x": 88, "y": 78, "w": 9, "h": 9 } },
+        { "value": "mfs", "label": "Married filing separately", "rect": { "x": 200, "y": 78, "w": 9, "h": 9 } },
+        { "value": "hoh", "label": "Head of household", "rect": { "x": 320, "y": 78, "w": 9, "h": 9 } },
+        { "value": "qss", "label": "Qualifying surviving spouse", "rect": { "x": 430, "y": 78, "w": 9, "h": 9 } }
+      ]
+    },
+    {
+      "id": "digital-assets",
+      "label": "Digital asset transactions question",
+      "type": "radio-group",
+      "page": 1,
+      "formReference": { "line": "Digital Assets" },
+      "binding": "$.return.digitalAssets",
+      "required": true,
+      "options": [
+        { "value": true, "label": "Yes", "rect": { "x": 480, "y": 150, "w": 9, "h": 9 } },
+        { "value": false, "label": "No", "rect": { "x": 520, "y": 150, "w": 9, "h": 9 } }
+      ]
+    },
+    {
+      "id": "dependent1-name",
+      "label": "Dependent 1: name",
+      "type": "text",
+      "page": 1,
+      "formReference": { "line": "Dependents", "box": "row 1, Name" },
+      "rect": { "x": 36, "y": 250, "w": 150, "h": 14 },
+      "binding": "$.dependents[0].name"
+    },
+    {
+      "id": "dependent1-ssn",
+      "label": "Dependent 1: SSN",
+      "type": "comb",
+      "page": 1,
+      "formReference": { "line": "Dependents", "box": "row 1, SSN" },
+      "binding": "$.dependents[0].ssn",
+      "cells": 9,
+      "cellOrigin": { "x": 190, "y": 250 },
+      "pitch": 10,
+      "cellSize": { "w": 9, "h": 14 },
+      "gaps": [
+        { "afterCell": 3, "extra": 4 },
+        { "afterCell": 5, "extra": 4 }
+      ]
+    },
+    {
+      "id": "dependent1-relationship",
+      "label": "Dependent 1: relationship",
+      "type": "text",
+      "page": 1,
+      "formReference": { "line": "Dependents", "box": "row 1, Relationship" },
+      "rect": { "x": 320, "y": 250, "w": 110, "h": 14 },
+      "binding": "$.dependents[0].relationship"
+    },
+    {
+      "id": "dependent1-ctc",
+      "label": "Dependent 1: Child Tax Credit checkbox",
+      "type": "checkbox",
+      "page": 1,
+      "formReference": { "line": "Dependents", "box": "row 1, CTC" },
+      "rect": { "x": 470, "y": 250, "w": 9, "h": 9 },
+      "binding": "$.dependents[0].qualifiesForCTC",
+      "checkedWhen": { "truthy": true }
+    },
+    {
+      "id": "dependent2-name",
+      "label": "Dependent 2: name",
+      "type": "text",
+      "page": 1,
+      "formReference": { "line": "Dependents", "box": "row 2, Name" },
+      "rect": { "x": 36, "y": 266, "w": 150, "h": 14 },
+      "binding": "$.dependents[1].name"
+    },
+    {
+      "id": "dependent2-ssn",
+      "label": "Dependent 2: SSN",
+      "type": "comb",
+      "page": 1,
+      "formReference": { "line": "Dependents", "box": "row 2, SSN" },
+      "binding": "$.dependents[1].ssn",
+      "cells": 9,
+      "cellOrigin": { "x": 190, "y": 266 },
+      "pitch": 10,
+      "cellSize": { "w": 9, "h": 14 },
+      "gaps": [
+        { "afterCell": 3, "extra": 4 },
+        { "afterCell": 5, "extra": 4 }
+      ]
+    },
+    {
+      "id": "dependent2-relationship",
+      "label": "Dependent 2: relationship",
+      "type": "text",
+      "page": 1,
+      "formReference": { "line": "Dependents", "box": "row 2, Relationship" },
+      "rect": { "x": 320, "y": 266, "w": 110, "h": 14 },
+      "binding": "$.dependents[1].relationship"
+    },
+    {
+      "id": "dependent2-ctc",
+      "label": "Dependent 2: Child Tax Credit checkbox",
+      "type": "checkbox",
+      "page": 1,
+      "formReference": { "line": "Dependents", "box": "row 2, CTC" },
+      "rect": { "x": 470, "y": 266, "w": 9, "h": 9 },
+      "binding": "$.dependents[1].qualifiesForCTC",
+      "checkedWhen": { "truthy": true }
+    },
+    {
+      "id": "line-1a-wages",
+      "label": "Line 1a: total wages",
+      "type": "currency",
+      "page": 1,
+      "formReference": { "line": "1a" },
+      "rect": { "x": 500, "y": 330, "w": 76, "h": 14 },
+      "binding": "$.income.wages.total",
+      "required": true,
+      "notes": "The data set carries the already-totaled amount; this spec does not sum across a caller's individual W-2 records. That aggregation is the caller's responsibility before the data set reaches the renderer."
+    },
+    {
+      "id": "line-25a-withholding",
+      "label": "Line 25a: federal income tax withheld",
+      "type": "currency",
+      "page": 1,
+      "formReference": { "line": "25a" },
+      "rect": { "x": 500, "y": 470, "w": 76, "h": 14 },
+      "binding": "$.income.federalWithholding",
+      "required": false,
+      "default": 0
+    },
+    {
+      "id": "num-qualifying-children",
+      "label": "Number of qualifying children under age 17",
+      "type": "number",
+      "page": 1,
+      "formReference": { "box": "Dependents summary" },
+      "rect": { "x": 470, "y": 300, "w": 24, "h": 12 },
+      "binding": "$.return.numQualifyingChildren",
+      "required": false,
+      "default": 0,
+      "format": { "decimalPlaces": 0, "thousandsSeparator": false, "zeroFormat": "blank" }
+    },
+    {
+      "id": "refund-amount",
+      "label": "Line 34: amount to be refunded",
+      "type": "currency",
+      "page": 1,
+      "formReference": { "line": "34" },
+      "rect": { "x": 500, "y": 590, "w": 76, "h": 14 },
+      "binding": "$.return.refundAmount",
+      "required": false,
+      "format": { "zeroFormat": "dash" }
+    },
+    {
+      "id": "signature-date",
+      "label": "Taxpayer signature date",
+      "type": "date",
+      "page": 1,
+      "formReference": { "box": "Sign Here - Date" },
+      "rect": { "x": 300, "y": 690, "w": 70, "h": 14 },
+      "binding": "$.taxpayer.signatureDate",
+      "required": true,
+      "dateFormat": "MM/DD/YYYY"
+    }
+  ]
+}

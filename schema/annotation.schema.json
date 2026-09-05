@@ -1,0 +1,888 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spec.instead.example/tax-form-annotation/1.0/annotation.schema.json",
+  "title": "Tax Form Annotation Document",
+  "description": "Defines where and how supplied structured data is rendered onto a tax form PDF. The annotation describes field location, data binding, formatting, and presentation. It does not transform or conditionally derive data.",
+  "type": "object",
+  "required": [
+    "specVersion",
+    "form",
+    "pages",
+    "fields"
+  ],
+  "additionalProperties": false,
+
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "Optional JSON Schema reference for editor and validation tooling."
+    },
+
+    "specVersion": {
+      "type": "string",
+      "const": "1.0",
+      "description": "Version of the annotation specification."
+    },
+
+    "form": {
+      "$ref": "#/$defs/form"
+    },
+
+    "pages": {
+      "type": "array",
+      "minItems": 1,
+      "description": "Pages in the source PDF and the coordinate system used by annotations.",
+      "items": {
+        "$ref": "#/$defs/page"
+      }
+    },
+
+    "defaults": {
+      "$ref": "#/$defs/style",
+      "description": "Optional document-wide rendering defaults. Individual fields may override these values."
+    },
+
+    "fields": {
+      "type": "array",
+      "minItems": 1,
+      "description": "Fields annotated on the tax form.",
+      "items": {
+        "$ref": "#/$defs/field"
+      }
+    }
+  },
+
+  "$defs": {
+
+    "form": {
+      "type": "object",
+      "required": [
+        "id",
+        "revision"
+      ],
+      "additionalProperties": false,
+
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9-]*$",
+          "description": "Stable identifier for the form.",
+          "examples": [
+            "f1040",
+            "f1040-sr",
+            "w2"
+          ]
+        },
+
+        "name": {
+          "type": "string",
+          "description": "Human-readable name of the form.",
+          "examples": [
+            "Form 1040 - U.S. Individual Income Tax Return"
+          ]
+        },
+
+        "taxYear": {
+          "type": "integer",
+          "minimum": 1900,
+          "description": "Tax year represented by the form."
+        },
+
+        "revision": {
+          "type": "string",
+          "description": "Form revision identifier. Field coordinates are valid only for this revision.",
+          "examples": [
+            "2025"
+          ]
+        },
+
+        "jurisdiction": {
+          "type": "string",
+          "default": "US-IRS",
+          "description": "Authority or jurisdiction that issued the form.",
+          "examples": [
+            "US-IRS",
+            "US-CA-FTB"
+          ]
+        },
+
+        "sourcePdf": {
+          "$ref": "#/$defs/sourcePdf",
+          "description": "The blank PDF against which field coordinates were measured."
+        }
+      }
+    },
+
+    "sourcePdf": {
+      "type": "object",
+      "required": [
+        "filename"
+      ],
+      "additionalProperties": false,
+
+      "properties": {
+        "filename": {
+          "type": "string",
+          "description": "Filename of the source PDF."
+        },
+
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-fA-F0-9]{64}$",
+          "description": "Optional SHA-256 hash of the source PDF."
+        }
+      }
+    },
+
+    "page": {
+      "type": "object",
+      "required": [
+        "number",
+        "width",
+        "height"
+      ],
+      "additionalProperties": false,
+
+      "properties": {
+        "number": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "1-based page number in the source PDF."
+        },
+
+        "width": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "description": "Page width."
+        },
+
+        "height": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "description": "Page height."
+        },
+
+        "unit": {
+          "type": "string",
+          "const": "pt",
+          "default": "pt",
+          "description": "Coordinate unit. PDF points are used by this specification."
+        },
+
+        "origin": {
+          "type": "string",
+          "const": "top-left",
+          "default": "top-left",
+          "description": "Origin of the coordinate system."
+        }
+      }
+    },
+
+    "rect": {
+      "type": "object",
+      "required": [
+        "x",
+        "y",
+        "w",
+        "h"
+      ],
+      "additionalProperties": false,
+
+      "properties": {
+        "x": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Left edge of the field, measured from the page's left edge."
+        },
+
+        "y": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Top edge of the field, measured from the page's top edge."
+        },
+
+        "w": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "description": "Field width in points."
+        },
+
+        "h": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "description": "Field height in points."
+        }
+      }
+    },
+
+    "formReference": {
+      "type": "object",
+      "description": "Optional reference to the printed line, box, or section on the physical form.",
+      "additionalProperties": false,
+
+      "properties": {
+        "line": {
+          "type": "string",
+          "description": "Printed line identifier, such as 1a or 12."
+        },
+
+        "box": {
+          "type": "string",
+          "description": "Printed box identifier, if applicable."
+        },
+
+        "section": {
+          "type": "string",
+          "description": "Printed section or area identifier."
+        }
+      }
+    },
+
+    "padding": {
+      "type": "object",
+      "additionalProperties": false,
+
+      "properties": {
+        "left": {
+          "type": "number",
+          "minimum": 0,
+          "default": 2
+        },
+
+        "right": {
+          "type": "number",
+          "minimum": 0,
+          "default": 2
+        },
+
+        "top": {
+          "type": "number",
+          "minimum": 0,
+          "default": 2
+        },
+
+        "bottom": {
+          "type": "number",
+          "minimum": 0,
+          "default": 2
+        }
+      }
+    },
+
+    "style": {
+      "type": "object",
+      "additionalProperties": false,
+
+      "properties": {
+        "font": {
+          "$ref": "#/$defs/font"
+        },
+
+        "textAlignment": {
+          "type": "string",
+          "enum": [
+            "left",
+            "center",
+            "right"
+          ],
+          "default": "left"
+        },
+
+        "verticalAlignment": {
+          "type": "string",
+          "enum": [
+            "top",
+            "middle",
+            "bottom"
+          ],
+          "default": "middle"
+        },
+
+        "padding": {
+          "$ref": "#/$defs/padding"
+        },
+
+        "overflow": {
+          "type": "string",
+          "enum": [
+            "shrink",
+            "truncate",
+            "error"
+          ],
+          "default": "shrink",
+          "description": "Behavior when rendered content does not fit inside the field."
+        },
+
+        "minFontSize": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "default": 5,
+          "description": "Minimum font size allowed when overflow is set to shrink."
+        },
+
+        "lineHeight": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "default": 1.15,
+          "description": "Line-height multiplier for multiline text."
+        }
+      }
+    },
+
+    "font": {
+      "type": "object",
+      "additionalProperties": false,
+
+      "properties": {
+        "family": {
+          "type": "string",
+          "default": "Helvetica"
+        },
+
+        "size": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "default": 9
+        },
+
+        "weight": {
+          "type": "string",
+          "enum": [
+            "normal",
+            "bold"
+          ],
+          "default": "normal"
+        },
+
+        "color": {
+          "type": "string",
+          "pattern": "^#[0-9a-fA-F]{6}$",
+          "default": "#000000"
+        }
+      }
+    },
+
+    "binding": {
+      "type": "string",
+      "pattern": "^\\$\\.[A-Za-z_][A-Za-z0-9_]*(\\[[0-9]+\\])?(\\.[A-Za-z_][A-Za-z0-9_]*(\\[[0-9]+\\])?)*$|^\\$$",
+      "description": "JSONPath-like path into the supplied data set. The root is represented by $.",
+      "examples": [
+        "$.taxpayer.income.wages",
+        "$.taxpayer.name.first",
+        "$.dependents[0].name"
+      ]
+    },
+
+    "fieldBase": {
+      "type": "object",
+
+      "required": [
+        "id",
+        "type",
+        "page",
+        "binding"
+      ],
+
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9_.-]*$",
+          "description": "Unique identifier for the annotation field."
+        },
+
+        "label": {
+          "type": "string",
+          "description": "Human-readable field description. Not rendered."
+        },
+
+        "type": {
+          "type": "string",
+          "enum": [
+            "text",
+            "number",
+            "currency",
+            "date",
+            "comb",
+            "checkbox",
+            "radio-group"
+          ]
+        },
+
+        "page": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Page number on which this field appears."
+        },
+
+        "formReference": {
+          "$ref": "#/$defs/formReference"
+        },
+
+        "binding": {
+          "$ref": "#/$defs/binding",
+          "description": "Reference to the value supplied by the input JSON."
+        },
+
+        "required": {
+          "type": "boolean",
+          "default": false,
+          "description": "If true, a missing or null bound value is a rendering error. If false, the field is skipped."
+        },
+
+        "default": {
+          "description": "Optional value to use when the binding is missing or null and required is false."
+        },
+
+        "style": {
+          "$ref": "#/$defs/style",
+          "description": "Field-specific style overrides."
+        },
+
+        "notes": {
+          "type": "string",
+          "description": "Annotation author notes. Not rendered."
+        }
+      }
+    },
+
+    "field": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/$defs/fieldBase"
+        },
+        {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/textField"
+            },
+            {
+              "$ref": "#/$defs/numberField"
+            },
+            {
+              "$ref": "#/$defs/currencyField"
+            },
+            {
+              "$ref": "#/$defs/dateField"
+            },
+            {
+              "$ref": "#/$defs/combField"
+            },
+            {
+              "$ref": "#/$defs/checkboxField"
+            },
+            {
+              "$ref": "#/$defs/radioGroupField"
+            }
+          ]
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+
+    "textField": {
+      "type": "object",
+      "required": [
+        "rect"
+      ],
+
+      "properties": {
+        "type": {
+          "const": "text"
+        },
+
+        "rect": {
+          "$ref": "#/$defs/rect"
+        },
+
+        "multiline": {
+          "type": "boolean",
+          "default": false
+        },
+
+        "maxLength": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Maximum number of characters that may be rendered."
+        },
+
+        "case": {
+          "type": "string",
+          "enum": [
+            "preserve",
+            "upper"
+          ],
+          "default": "preserve"
+        }
+      }
+    },
+
+    "numberField": {
+      "type": "object",
+      "required": [
+        "rect"
+      ],
+
+      "properties": {
+        "type": {
+          "const": "number"
+        },
+
+        "rect": {
+          "$ref": "#/$defs/rect"
+        },
+
+        "format": {
+          "$ref": "#/$defs/numberFormat"
+        }
+      }
+    },
+
+    "numberFormat": {
+      "type": "object",
+      "additionalProperties": false,
+
+      "properties": {
+        "decimalPlaces": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 0
+        },
+
+        "thousandsSeparator": {
+          "type": "boolean",
+          "default": true
+        },
+
+        "negativeFormat": {
+          "type": "string",
+          "enum": [
+            "minus",
+            "parentheses"
+          ],
+          "default": "minus"
+        },
+
+        "zeroFormat": {
+          "type": "string",
+          "enum": [
+            "print",
+            "blank",
+            "dash"
+          ],
+          "default": "print"
+        }
+      }
+    },
+
+    "currencyField": {
+      "type": "object",
+      "required": [
+        "rect"
+      ],
+
+      "properties": {
+        "type": {
+          "const": "currency"
+        },
+
+        "rect": {
+          "$ref": "#/$defs/rect"
+        },
+
+        "format": {
+          "$ref": "#/$defs/currencyFormat"
+        }
+      }
+    },
+
+    "currencyFormat": {
+      "type": "object",
+      "additionalProperties": false,
+
+      "properties": {
+        "currency": {
+          "type": "string",
+          "pattern": "^[A-Z]{3}$",
+          "default": "USD",
+          "description": "ISO 4217 currency code."
+        },
+
+        "decimalPlaces": {
+          "type": "integer",
+          "enum": [
+            0,
+            2
+          ],
+          "default": 0
+        },
+
+        "thousandsSeparator": {
+          "type": "boolean",
+          "default": true
+        },
+
+        "currencySymbol": {
+          "type": "boolean",
+          "default": false
+        },
+
+        "negativeFormat": {
+          "type": "string",
+          "enum": [
+            "minus",
+            "parentheses"
+          ],
+          "default": "parentheses"
+        },
+
+        "zeroFormat": {
+          "type": "string",
+          "enum": [
+            "print",
+            "blank",
+            "dash"
+          ],
+          "default": "print"
+        }
+      }
+    },
+
+    "dateField": {
+      "type": "object",
+      "required": [
+        "rect"
+      ],
+
+      "properties": {
+        "type": {
+          "const": "date"
+        },
+
+        "rect": {
+          "$ref": "#/$defs/rect"
+        },
+
+        "dateFormat": {
+          "type": "string",
+          "default": "MM/DD/YYYY",
+          "description": "Output date format. Input is expected to be an ISO-8601 date."
+        }
+      }
+    },
+
+    "combField": {
+      "type": "object",
+      "required": [
+        "cells",
+        "cellOrigin",
+        "pitch",
+        "cellSize"
+      ],
+
+      "properties": {
+        "type": {
+          "const": "comb"
+        },
+
+        "cells": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Number of individual character cells."
+        },
+
+        "cellOrigin": {
+          "type": "object",
+          "required": [
+            "x",
+            "y"
+          ],
+          "additionalProperties": false,
+
+          "properties": {
+            "x": {
+              "type": "number",
+              "minimum": 0
+            },
+
+            "y": {
+              "type": "number",
+              "minimum": 0
+            }
+          }
+        },
+
+        "pitch": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "description": "Horizontal distance between the left edges of adjacent cells."
+        },
+
+        "cellSize": {
+          "type": "object",
+          "required": [
+            "w",
+            "h"
+          ],
+          "additionalProperties": false,
+
+          "properties": {
+            "w": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+
+            "h": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            }
+          }
+        },
+
+        "gaps": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/combGap"
+          }
+        },
+
+        "fit": {
+          "type": "string",
+          "enum": [
+            "exact",
+            "left"
+          ],
+          "default": "exact",
+          "description": "Whether the supplied value must exactly fill the cells or may use fewer cells."
+        }
+      }
+    },
+
+    "combGap": {
+      "type": "object",
+      "required": [
+        "afterCell",
+        "extra"
+      ],
+      "additionalProperties": false,
+
+      "properties": {
+        "afterCell": {
+          "type": "integer",
+          "minimum": 1
+        },
+
+        "extra": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Additional horizontal spacing in points."
+        }
+      }
+    },
+
+    "checkboxField": {
+      "type": "object",
+      "required": [
+        "rect",
+        "checkedWhen"
+      ],
+
+      "properties": {
+        "type": {
+          "const": "checkbox"
+        },
+
+        "rect": {
+          "$ref": "#/$defs/rect"
+        },
+
+        "checkedWhen": {
+          "$ref": "#/$defs/checkedWhen"
+        },
+
+        "mark": {
+          "type": "string",
+          "enum": [
+            "X",
+            "check",
+            "fill"
+          ],
+          "default": "X"
+        }
+      }
+    },
+
+    "checkedWhen": {
+      "type": "object",
+      "minProperties": 1,
+      "maxProperties": 1,
+      "additionalProperties": false,
+
+      "properties": {
+        "equals": {
+          "description": "The checkbox is marked when the supplied value strictly equals this value."
+        },
+
+        "truthy": {
+          "type": "boolean",
+          "const": true,
+          "description": "The checkbox is marked when the supplied value is truthy."
+        }
+      }
+    },
+
+    "radioGroupField": {
+      "type": "object",
+      "required": [
+        "options"
+      ],
+
+      "properties": {
+        "type": {
+          "const": "radio-group"
+        },
+
+        "options": {
+          "type": "array",
+          "minItems": 2,
+          "items": {
+            "$ref": "#/$defs/radioOption"
+          }
+        },
+
+        "mark": {
+          "type": "string",
+          "enum": [
+            "X",
+            "check",
+            "fill"
+          ],
+          "default": "X"
+        }
+      }
+    },
+
+    "radioOption": {
+      "type": "object",
+      "required": [
+        "value",
+        "rect"
+      ],
+      "additionalProperties": false,
+
+      "properties": {
+        "value": {
+          "description": "Option value. The option is marked when the bound value strictly equals this value."
+        },
+
+        "rect": {
+          "$ref": "#/$defs/rect"
+        },
+
+        "label": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "taxpayer": {
+    "firstName": "Jordan",
+    "lastName": "Rivera",
+    "ssn": "123-45-6789",
+    "signatureDate": "2026-04-10"
+  },
+  "return": {
+    "filingStatus": "single",
+    "digitalAssets": true,
+    "numQualifyingChildren": 1,
+    "refundAmount": 842
+  },
+  "dependents": [
+    {
+      "name": "Casey Rivera",
+      "ssn": "234-56-7890",
+      "relationship": "Daughter",
+      "qualifiesForCTC": true
+    },
+    {
+      "name": "Riley Rivera",
+      "ssn": "345-67-8901",
+      "relationship": "Son",
+      "qualifiesForCTC": false
+    }
+  ],
+  "income": {
+    "wages": {
+      "total": 68500
+    },
+    "federalWithholding": 7120
+  }
+}
