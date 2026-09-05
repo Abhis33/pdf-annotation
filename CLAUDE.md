@@ -89,6 +89,7 @@ who builds a renderer, and the caller who supplies data.
 | `schema/annotation.schema.json`             | JSON Schema (draft 2020-12) that validates annotation documents. Must stay in sync with SPEC.md — a property that exists in one but not the other is a bug.        |
 | `examples/f1040-simplified.annotation.json` | Worked example exercising every field type. Must always validate against `schema/annotation.schema.json`.                                                          |
 | `examples/sample-data.json`                 | The nested data set the example annotation binds against.                                                                                                          |
+| `main.py`, `annotator/`                     | Reference renderer: CLI entry point + implementation of the SPEC.md rendering contract (binding resolution, formatting, style resolution, layout/drawing).         |
 | `README.md`                                 | Entry point / quick overview, links into the above.                                                                                                                |
 
 ## Design constraints (intentional, not gaps)
@@ -131,27 +132,38 @@ form.revision)` pair.
 
 ## Development setup
 
-Python is the primary language for this repo's tooling (tests, lint). Dev
-dependencies are pinned in `requirements-dev.txt`:
+Python is the primary language for this repo's tooling (tests, lint) and for the
+reference renderer. Runtime dependencies (`jsonschema`, `reportlab`, `pypdf`) are
+pinned in `requirements.txt`; dev-only dependencies (test/lint tooling) are pinned
+separately in `requirements-dev.txt`:
 
 ```bash
 python3 -m venv .venv
-./.venv/bin/pip install -r requirements-dev.txt
+./.venv/bin/pip install -r requirements.txt -r requirements-dev.txt
 ```
 
-- **Tests** (`tests/test_schema_validity.py`): checks that
-  `schema/annotation.schema.json` is well-formed JSON, is a legal draft 2020-12
-  JSON Schema, and has no dangling internal `$ref`s. Run with:
-  ```bash
-  ./.venv/bin/pytest
-  ```
-  This does not validate any annotation document against the schema — that's a
-  separate, not-yet-added check (see `progress.md`).
+- **Reference renderer**: `python main.py <annotation.json> <data.json> <source.pdf>`
+  — see the README's "Reference renderer" section for details, and `annotator/`'s
+  module docstrings (`binding.py`, `formatting.py`, `styles.py`, `render.py`) for
+  how each SPEC.md section is implemented.
+- **Tests**, run with `./.venv/bin/pytest`:
+  - `tests/test_schema_validity.py`: checks that `schema/annotation.schema.json`
+    is well-formed JSON, is a legal draft 2020-12 JSON Schema, and has no
+    dangling internal `$ref`s.
+  - `tests/test_annotation_validation.py`: validates one minimal annotation
+    document against the schema, plus three targeted negative cases (missing a
+    required top-level key, a binding without the `$` root, a field with an
+    unrecognized property). Deliberately not exhaustive — see the module
+    docstring and `progress.md` for what's still uncovered.
+  - There are no automated tests yet for `annotator/` itself (see `progress.md`
+    open items) — it's been exercised manually against `examples/` and ad hoc
+    fixtures covering every field type, overflow mode, and the required/schema
+    error paths.
 - **Python formatting/lint**: `black` (formatter) and `ruff` (linter), configured
   in `pyproject.toml`.
   ```bash
-  ./.venv/bin/black tests/
-  ./.venv/bin/ruff check tests/
+  ./.venv/bin/black main.py annotator/ tests/
+  ./.venv/bin/ruff check main.py annotator/ tests/
   ```
 - **JSON/Markdown formatting**: Prettier, configured in `.prettierrc.json`.
   Run via `npx`, same convention as the `ajv-cli` command above — pin the

@@ -84,7 +84,7 @@ automated example-vs-schema regression check, and Markdown link-checking.
   `[tool.ruff]`) and `requirements-dev.txt` (pinned: `jsonschema`, `pytest`,
   `black`, `ruff`) for a reproducible Python dev setup.
 - Added Prettier config (`.prettierrc.json`, `.prettierignore` — excludes
-  dev-tooling directories) and ran it once over the repo's
+  `output/` and dev-tooling directories) and ran it once over the repo's
   existing JSON/Markdown files to establish a clean baseline. This reformatted
   `schema/annotation.schema.json`, `examples/f1040-simplified.annotation.json`,
   `README.md`, `SPEC.md`, and `CLAUDE.md` — confirmed semantically identical
@@ -104,8 +104,115 @@ yet.
 
 **Open items / possible next steps** (still not started):
 
-- Positive/negative fixture tests exercising the schema's actual validation
-  rules (field-type discrimination, binding pattern edges, enum/format edges).
 - An automated check that `examples/*.annotation.json` still validates against
   the schema (currently only done ad hoc / manually).
 - Markdown link-checking for the relative links in SPEC.md/README.md/CLAUDE.md.
+
+## 2026-09-05 (later still) — A few core positive/negative fixture checks
+
+**Ask:** add positive/negative fixture tests, but scoped down deliberately —
+"a few core things," not full coverage of every field type/enum, and not a
+fixtures directory with one file per case. Agreed plan before implementing:
+one new test file, fixtures as inline Python dicts (a single minimal valid
+base document, deep-copied and mutated per case), four total test functions.
+
+**Work done:**
+
+- Added `tests/test_annotation_validation.py`: one positive test (a minimal
+  valid document — `specVersion`, `form`, one page, one `text` field —
+  validates) plus three negative tests, each the base document with one
+  targeted mutation:
+  - a required top-level key (`fields`) removed,
+  - a field's `binding` missing the `$` root (`"taxpayer.ssn"` instead of
+    `"$.taxpayer.ssn"`),
+  - a field with an unrecognized property added (`bogus: true`) — a direct
+    regression guard for the `unevaluatedProperties`/`type: object` fix made
+    in the first testing pass.
+- All 4 new tests pass alongside the existing 3 schema-validity tests (7
+  total); running them confirmed the schema actually rejects all three
+  mutations, not just that the positive case happens to pass.
+- Formatted/linted with `black`/`ruff` (clean, no changes needed).
+- Updated `CLAUDE.md`'s "Key files"/"Development setup" sections to describe
+  the new test module and removed the now-stale "positive/negative fixture
+  tests" line from the open-items list above.
+
+**Status:** two test modules now exist —
+`tests/test_schema_validity.py` (the schema is well-formed) and
+`tests/test_annotation_validation.py` (a handful of core validation rules
+actually hold). Deliberately still not covering every field type, enum, or
+format option. Nothing committed to git yet.
+
+## 2026-09-05 (later still) — Reference renderer implementation
+
+**Ask:** build the reference renderer previously deferred: `python main.py
+<annotation.json> <input_data.json> <input_pdf>` produces `output/output.pdf`,
+plus a log file under `logs/` capturing anything that went wrong during the run.
+
+**Also found and fixed in passing:** `CLAUDE.md`, `README.md`, `progress.md`, and
+`.prettierignore` had leftover unresolved `<<<<<<<`/`=======`/`>>>>>>>` git conflict
+markers (from an earlier `git stash` conflict that was never cleaned up) sitting in
+the tracked file content. Resolved all four in favor of the newer ("Stashed
+changes") side, which was a strict superset of the older side in every case — no
+content was lost.
+
+**Work done:**
+
+- Added `requirements.txt` (runtime deps, separate from `requirements-dev.txt`):
+  `jsonschema` (already a dev dep, now also runtime), `reportlab` (drawing),
+  `pypdf` (reading/writing the source PDF).
+- Added the `annotator/` package implementing the SPEC.md rendering contract:
+  - `binding.py`: section 6 path resolution (`$.a.b[0].c`) and the strict,
+    type-sensitive equality used by `checkedWhen`/radio-group option matching
+    (so `1 != "1"` and `True != 1`, per 5.6/5.7).
+  - `formatting.py`: section 7.1 number/currency formatting (half-away-from-zero
+    rounding via `Decimal`, thousands separator, minus/parentheses negatives,
+    print/blank/dash zero handling), date token substitution, and comb-value
+    character stripping/length validation.
+  - `styles.py`: section 4 per-property style resolution (field -> defaults ->
+    spec default) and family/weight -> base-14 PDF font name mapping (unknown
+    families fall back to Helvetica with a logged warning, per spec).
+  - `render.py`: section 3 coordinate conversion, section 7.2 layout (single-line
+    alignment via font ascent/descent metrics, greedy word-wrap for
+    `multiline`), section 7.3 overflow (`shrink`/`truncate`/`error`), and drawing
+    for all seven field types. Renders one reportlab overlay page per source PDF
+    page, then merges it onto the original via `pypdf` so the source form's own
+    content is preserved.
+  - Field-level errors are collected across the whole document (not
+    fail-fast-on-first) so a run reports every failing field at once.
+- Added `main.py`: CLI entry point. Validates the annotation document against
+  `schema/annotation.schema.json` before doing anything else; writes a
+  timestamped log file per run to `logs/` (so concurrent/repeated runs don't
+  clobber each other) with warnings mirrored to stderr; exits non-zero without
+  writing `output.pdf` if schema validation or any field's render fails.
+- Checkmark mark (`mark: "check"`) is drawn as two vector line strokes rather
+  than a ZapfDingbats glyph — found via manual visual testing that at least one
+  common PDF rasterizer substitutes a filled "missing glyph" box for that font/
+  character code instead of an actual check mark. Vector strokes render
+  correctly everywhere and avoid the dependency entirely.
+- Manually verified end-to-end against `examples/` (runs cleanly, no warnings,
+  page dimensions match) and against ad hoc fixtures built to exercise: all
+  three checkbox marks, an unchecked box, radio-group selection, multiline
+  word-wrap, overflow `shrink`, negative currency parentheses-rounding, and comb
+  digit placement — by rendering output PDFs to PNG and inspecting them.
+  Also verified the three failure paths (missing required value, schema-invalid
+  annotation document, missing source PDF) each exit non-zero with a clear
+  console message and a log file naming the specific problem.
+- All 7 existing tests (`pytest`) still pass, unmodified. `black`/`ruff` clean
+  on `main.py` and `annotator/`.
+
+**Status:** a working reference renderer exists end-to-end for all seven field
+types. Nothing has been committed to git yet.
+
+**Open items / possible next steps** (not started, not committed to):
+
+- No automated tests for `annotator/` yet — coverage so far is manual/ad hoc
+  (see above). A pytest suite exercising binding resolution, formatting edge
+  cases, and a couple of full render-to-PDF smoke tests would be the natural
+  next step.
+- `sourcePdf.sha256` (SPEC.md section 2) is not checked by the renderer — it's
+  documented as a pin against the wrong PDF revision but nothing currently
+  verifies it.
+- Font embedding is not supported — `styles.py` only maps onto the PDF standard
+  14 fonts (Helvetica/Times/Courier families); a `font.family` outside those
+  falls back to Helvetica with a warning rather than embedding the requested
+  font.

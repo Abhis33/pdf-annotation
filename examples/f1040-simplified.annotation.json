@@ -8,10 +8,13 @@
     "revision": "2025",
     "jurisdiction": "US-IRS",
     "sourcePdf": {
-      "filename": "f1040--2025.pdf"
+      "filename": "f1040.pdf"
     }
   },
-  "pages": [{ "number": 1, "width": 612, "height": 792 }],
+  "pages": [
+    { "number": 1, "width": 612, "height": 792 },
+    { "number": 2, "width": 612, "height": 792 }
+  ],
   "defaults": {
     "font": { "family": "Helvetica", "size": 9 },
     "overflow": "shrink"
@@ -23,7 +26,7 @@
       "type": "text",
       "page": 1,
       "formReference": { "line": "1", "box": "First name and middle initial" },
-      "rect": { "x": 36, "y": 104, "w": 200, "h": 16 },
+      "rect": { "x": 36, "y": 94, "w": 215, "h": 14 },
       "binding": "$.taxpayer.firstName",
       "required": true
     },
@@ -33,7 +36,7 @@
       "type": "text",
       "page": 1,
       "formReference": { "line": "1", "box": "Last name" },
-      "rect": { "x": 246, "y": 104, "w": 200, "h": 16 },
+      "rect": { "x": 253, "y": 94, "w": 214, "h": 14 },
       "binding": "$.taxpayer.lastName",
       "required": true
     },
@@ -46,13 +49,10 @@
       "binding": "$.taxpayer.ssn",
       "required": true,
       "cells": 9,
-      "cellOrigin": { "x": 470, "y": 104 },
-      "pitch": 13,
-      "cellSize": { "w": 12, "h": 16 },
-      "gaps": [
-        { "afterCell": 3, "extra": 6 },
-        { "afterCell": 5, "extra": 6 }
-      ],
+      "cellOrigin": { "x": 468, "y": 95 },
+      "pitch": 10.9,
+      "cellSize": { "w": 10.9, "h": 12 },
+      "gaps": [{ "afterCell": 5, "extra": 5 }],
       "notes": "Value in the data set may be punctuated (123-45-6789) or bare (123456789); the renderer strips non-digits before filling cells."
     },
     {
@@ -67,27 +67,27 @@
         {
           "value": "single",
           "label": "Single",
-          "rect": { "x": 40, "y": 78, "w": 9, "h": 9 }
+          "rect": { "x": 98, "y": 206, "w": 8, "h": 8 }
         },
         {
           "value": "mfj",
           "label": "Married filing jointly",
-          "rect": { "x": 88, "y": 78, "w": 9, "h": 9 }
+          "rect": { "x": 98, "y": 218, "w": 8, "h": 8 }
         },
         {
           "value": "mfs",
           "label": "Married filing separately",
-          "rect": { "x": 200, "y": 78, "w": 9, "h": 9 }
+          "rect": { "x": 98, "y": 230, "w": 8, "h": 8 }
         },
         {
           "value": "hoh",
           "label": "Head of household",
-          "rect": { "x": 320, "y": 78, "w": 9, "h": 9 }
+          "rect": { "x": 350, "y": 206, "w": 8, "h": 8 }
         },
         {
           "value": "qss",
           "label": "Qualifying surviving spouse",
-          "rect": { "x": 430, "y": 78, "w": 9, "h": 9 }
+          "rect": { "x": 350, "y": 218, "w": 8, "h": 8 }
         }
       ]
     },
@@ -103,12 +103,12 @@
         {
           "value": true,
           "label": "Yes",
-          "rect": { "x": 480, "y": 150, "w": 9, "h": 9 }
+          "rect": { "x": 518, "y": 287, "w": 8, "h": 8 }
         },
         {
           "value": false,
           "label": "No",
-          "rect": { "x": 520, "y": 150, "w": 9, "h": 9 }
+          "rect": { "x": 554, "y": 287, "w": 8, "h": 8 }
         }
       ]
     },
@@ -117,8 +117,8 @@
       "label": "Dependent 1: name",
       "type": "text",
       "page": 1,
-      "formReference": { "line": "Dependents", "box": "row 1, Name" },
-      "rect": { "x": 36, "y": 250, "w": 150, "h": 14 },
+      "formReference": { "line": "Dependents", "box": "column 1, Name" },
+      "rect": { "x": 145, "y": 309, "w": 106, "h": 12 },
       "binding": "$.dependents[0].name"
     },
     {
@@ -126,24 +126,20 @@
       "label": "Dependent 1: SSN",
       "type": "comb",
       "page": 1,
-      "formReference": { "line": "Dependents", "box": "row 1, SSN" },
+      "formReference": { "line": "Dependents", "box": "column 1, SSN" },
       "binding": "$.dependents[0].ssn",
       "cells": 9,
-      "cellOrigin": { "x": 190, "y": 250 },
-      "pitch": 10,
-      "cellSize": { "w": 9, "h": 14 },
-      "gaps": [
-        { "afterCell": 3, "extra": 4 },
-        { "afterCell": 5, "extra": 4 }
-      ]
+      "cellOrigin": { "x": 144, "y": 333 },
+      "pitch": 12,
+      "cellSize": { "w": 12, "h": 12 }
     },
     {
       "id": "dependent1-relationship",
       "label": "Dependent 1: relationship",
       "type": "text",
       "page": 1,
-      "formReference": { "line": "Dependents", "box": "row 1, Relationship" },
-      "rect": { "x": 320, "y": 250, "w": 110, "h": 14 },
+      "formReference": { "line": "Dependents", "box": "column 1, Relationship" },
+      "rect": { "x": 145, "y": 345, "w": 106, "h": 12 },
       "binding": "$.dependents[0].relationship"
     },
     {
@@ -151,8 +147,8 @@
       "label": "Dependent 1: Child Tax Credit checkbox",
       "type": "checkbox",
       "page": 1,
-      "formReference": { "line": "Dependents", "box": "row 1, CTC" },
-      "rect": { "x": 470, "y": 250, "w": 9, "h": 9 },
+      "formReference": { "line": "Dependents", "box": "column 1, CTC" },
+      "rect": { "x": 148, "y": 404, "w": 8, "h": 8 },
       "binding": "$.dependents[0].qualifiesForCTC",
       "checkedWhen": { "truthy": true }
     },
@@ -161,8 +157,8 @@
       "label": "Dependent 2: name",
       "type": "text",
       "page": 1,
-      "formReference": { "line": "Dependents", "box": "row 2, Name" },
-      "rect": { "x": 36, "y": 266, "w": 150, "h": 14 },
+      "formReference": { "line": "Dependents", "box": "column 2, Name" },
+      "rect": { "x": 253, "y": 309, "w": 106, "h": 12 },
       "binding": "$.dependents[1].name"
     },
     {
@@ -170,24 +166,20 @@
       "label": "Dependent 2: SSN",
       "type": "comb",
       "page": 1,
-      "formReference": { "line": "Dependents", "box": "row 2, SSN" },
+      "formReference": { "line": "Dependents", "box": "column 2, SSN" },
       "binding": "$.dependents[1].ssn",
       "cells": 9,
-      "cellOrigin": { "x": 190, "y": 266 },
-      "pitch": 10,
-      "cellSize": { "w": 9, "h": 14 },
-      "gaps": [
-        { "afterCell": 3, "extra": 4 },
-        { "afterCell": 5, "extra": 4 }
-      ]
+      "cellOrigin": { "x": 252, "y": 333 },
+      "pitch": 12,
+      "cellSize": { "w": 12, "h": 12 }
     },
     {
       "id": "dependent2-relationship",
       "label": "Dependent 2: relationship",
       "type": "text",
       "page": 1,
-      "formReference": { "line": "Dependents", "box": "row 2, Relationship" },
-      "rect": { "x": 320, "y": 266, "w": 110, "h": 14 },
+      "formReference": { "line": "Dependents", "box": "column 2, Relationship" },
+      "rect": { "x": 253, "y": 345, "w": 106, "h": 12 },
       "binding": "$.dependents[1].relationship"
     },
     {
@@ -195,8 +187,8 @@
       "label": "Dependent 2: Child Tax Credit checkbox",
       "type": "checkbox",
       "page": 1,
-      "formReference": { "line": "Dependents", "box": "row 2, CTC" },
-      "rect": { "x": 470, "y": 266, "w": 9, "h": 9 },
+      "formReference": { "line": "Dependents", "box": "column 2, CTC" },
+      "rect": { "x": 256, "y": 404, "w": 8, "h": 8 },
       "binding": "$.dependents[1].qualifiesForCTC",
       "checkedWhen": { "truthy": true }
     },
@@ -206,9 +198,10 @@
       "type": "currency",
       "page": 1,
       "formReference": { "line": "1a" },
-      "rect": { "x": 500, "y": 330, "w": 76, "h": 14 },
+      "rect": { "x": 504, "y": 450, "w": 72, "h": 12 },
       "binding": "$.income.wages.total",
       "required": true,
+      "style": { "textAlignment": "right" },
       "notes": "The data set carries the already-totaled amount; this spec does not sum across a caller's individual W-2 records. That aggregation is the caller's responsibility before the data set reaches the renderer."
     },
     {
@@ -217,7 +210,7 @@
       "type": "currency",
       "page": 1,
       "formReference": { "line": "25a" },
-      "rect": { "x": 500, "y": 470, "w": 76, "h": 14 },
+      "rect": { "x": 505, "y": 475, "w": 76, "h": 14 },
       "binding": "$.income.federalWithholding",
       "required": false,
       "default": 0
@@ -242,9 +235,9 @@
       "id": "refund-amount",
       "label": "Line 34: amount to be refunded",
       "type": "currency",
-      "page": 1,
+      "page": 2,
       "formReference": { "line": "34" },
-      "rect": { "x": 500, "y": 590, "w": 76, "h": 14 },
+      "rect": { "x": 506, "y": 493, "w": 76, "h": 14 },
       "binding": "$.return.refundAmount",
       "required": false,
       "format": { "zeroFormat": "dash" }
@@ -253,9 +246,9 @@
       "id": "signature-date",
       "label": "Taxpayer signature date",
       "type": "date",
-      "page": 1,
+      "page": 2,
       "formReference": { "box": "Sign Here - Date" },
-      "rect": { "x": 300, "y": 690, "w": 70, "h": 14 },
+      "rect": { "x": 278, "y": 648, "w": 46, "h": 16 },
       "binding": "$.taxpayer.signatureDate",
       "required": true,
       "dateFormat": "MM/DD/YYYY"

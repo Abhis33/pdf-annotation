@@ -10,6 +10,7 @@ into exactly the right boxes on the form.
 | [`schema/annotation.schema.json`](schema/annotation.schema.json)                         | JSON Schema (draft 2020-12) for validating annotation documents.                                                                                                                                                                                                                |
 | [`examples/f1040-simplified.annotation.json`](examples/f1040-simplified.annotation.json) | A worked annotation of an illustrative subset of Form 1040: text, currency, date, a comb (SSN), checkbox, radio-groups (including a boolean-valued one), and a repeated dependent block modeled as independent, explicitly-indexed field groups rather than a repeat construct. |
 | [`examples/sample-data.json`](examples/sample-data.json)                                 | The nested data set the example annotation binds against.                                                                                                                                                                                                                       |
+| [`main.py`](main.py) / [`annotator/`](annotator)                                         | A reference renderer implementing the SPEC.md rendering contract end to end.                                                                                                                                                                                                    |
 
 Scope, by design: every value a field prints already exists in the caller's data set —
 this spec positions, formats, and references values, but never computes or derives
@@ -49,6 +50,23 @@ npx ajv-cli@5 validate --spec=draft2020 \
   -s schema/annotation.schema.json -d examples/f1040-simplified.annotation.json
 ```
 
+## Reference renderer
+
+`main.py` renders an annotation document + a data set onto the blank source PDF:
+
+```bash
+python3 -m venv .venv && ./.venv/bin/pip install -r requirements.txt
+./.venv/bin/python main.py examples/f1040-simplified.annotation.json \
+  examples/sample-data.json examples/f1040.pdf
+```
+
+It validates the annotation document against `schema/annotation.schema.json` before
+rendering, writes the completed form to `output/output.pdf`, and writes a timestamped
+log of the run (including any warnings/errors) to `logs/`. A run that hits a
+spec-mandated error (a missing required value, a type mismatch, an overflowing field
+with `overflow: "error"`, etc.) exits non-zero without writing `output.pdf` — see the
+log for which field(s) failed and why.
+
 ## Tests, linting, formatting
 
 See [`CLAUDE.md`](CLAUDE.md#development-setup) for the full setup. Short version:
@@ -63,6 +81,7 @@ npx prettier@3.3.3 --check "**/*.{json,md}" --ignore-path .prettierignore  # JSO
 # Important Links
 
 ### Calculating x,y coordinates of fields on pdf forms
+
 https://jol333.github.io/pdf-coordinates/
 
 ### Exporting annotations from forms that are already annotated
